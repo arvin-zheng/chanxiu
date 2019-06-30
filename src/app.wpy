@@ -285,7 +285,7 @@
       tabBar: {
         color: '#cecbb7',
         selectedColor: '#fff',
-        borderStyle: '#B0976E',
+        borderStyle: 'black',
         backgroundColor: '#B0976E',
         list: [
           {

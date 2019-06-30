@@ -255,12 +255,12 @@
   .line-2 {
     line-height: 2;
   }
-  .line-4-content {
-    height: 90px;
-    overflow: hidden;
+  .line-3-content {
+    height:68px;
+    overflow:hidden;
     line-height: 1.7;
     overflow: hidden;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 3;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -269,6 +269,7 @@
     display: flex;
     width: 100%;
     margin-top: 10px;
+    justify-content: flex-end;
   }
   .m-l-35 {
     margin-left: 35px;
@@ -678,14 +679,14 @@
             </view>
             <view class="ex-date">{{item.strCreateTimeStr}}</view>
           </view>
-          <text class="flex-r m-l-35 line-2 {{!item.readAll && item.type == 2 ? 'line-4-content' : ''}} {{!!item.content ? '' : 'hide'}}">{{item.content}}</text>
+          <text class="flex-r m-l-35 line-2 {{!item.readAll && item.content.length > 63 ? 'line-3-content' : ''}} {{!!item.content ? '' : 'hide'}}">{{item.content}}</text>
           <view class="ex-process-pannel">
             <view class="read-all" @tap="readAllContent({{item}}, {{index}})">
               {{item.type == 2 && !item.readAll ? '查看全文' : ''}}
             </view>
             <view class="process-btns">
-              <image class="process-btn" src="/images/edit.png" wx:if="{{upstateState && item.iconType == 5}}" @tap="edit({{item}})"></image>
-              <image class="process-btn delete-btn" src="/images/delete.png" wx:if="{{upstateState && (item.afterRecord || item.iconType == 5)}}" @tap="deleteEx({{item}})"></image>
+              <image class="process-btn" src="/images/edit.png" wx:if="{{upstateState && item.type == 2}}" @tap="edit({{item}})"></image>
+              <image class="process-btn delete-btn" src="/images/delete.png" wx:if="{{upstateState}}" @tap="deleteEx({{item}})"></image>
               <button class="process-btn btn share-briefing-btn" wx:if="{{upstateState && item.content}}" id="briefingShare{{item.iconType}}_{{index}}" name="briefingShare" open-type="share">
                 <image src="/images/send.png" class="btn-img"></image>
               </button>
@@ -714,11 +715,11 @@
     <deleteEx>
       <view class="popup-headerr">
         <view class="flex-1">
-          删除练习{{dynamic.iconType == 5 ? '日记' : '状态'}}确认
+          删除练习{{dynamic.type == 2 ? '日记' : '状态'}}确认
         </view>
         <image class="close-icon" src="/images/close-icon.png" @tap="deleteExCancel"/>
       </view>
-      <view class="delete-ex-desc">确定删除这条练习{{dynamic.iconType == 5 ? '日记' : '状态'}}吗？</view>
+      <view class="delete-ex-desc">确定删除这条练习{{dynamic.type == 2 ? '日记' : '状态'}}吗？</view>
       <view class="popup-footer">
         <view class="cancel-btn mr-20" @tap="deleteExCancel">取消</view>
         <view class="cancel-btn confirm-btn" @tap="deleteComfirm">删除</view>
@@ -992,8 +993,9 @@
   /**
    * 删除日记
    */
-  const dynamicDel = function (refId, afterRecord) {
-    const url = afterRecord ? '/train/del' : '/diary/del'
+  const dynamicDel = function (refId, type) {
+    // 1=静坐，2=站桩，3=行禅，4=禅睡，5=日记
+    const url = type == 1 ? '/train/del' : '/diary/del'
     ajax({
       ins: this,
       url: url,
@@ -1094,6 +1096,8 @@
         const shareBtnId = res.target ? res.target.id : ''
         const nickName = this.userInfo.nickName
 
+        console.log(shareBtnId)
+
         // 从简报页右上角直接转发
         let path = 'pages/ex-briefing?_f=1&userId=' + this.userId
         let title = nickName + '的练习简报'
@@ -1137,7 +1141,7 @@
         this.dynamic = item
 
         // 修改日记
-        if (item.iconType == 5) {
+        if (item.type == 2) {
           this.$parent.globalData.diaryTitle = this.dynamic.title
           this.$parent.globalData.diaryContent = this.dynamic.content
           this.$parent.globalData.diaryId = this.dynamic.refId
@@ -1174,7 +1178,7 @@
         this.$invoke('deleteEx', 'togglePopup')
       },
       deleteComfirm() {
-        dynamicDel.apply(this, [this.dynamic.refId, this.dynamic.afterRecord])
+        dynamicDel.apply(this, [this.dynamic.refId, this.dynamic.type])
         this.$invoke('deleteEx', 'togglePopup')
       },
       processShow(item) {
