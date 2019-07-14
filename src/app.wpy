@@ -310,13 +310,23 @@
             selectText: '我',
           }
         ]
-      }
+      },
+      navigateToMiniProgramAppIdList: [
+        'wx03bd71f622be4ca1'
+      ]
     }
 
     onShow = () => {
         // wx.setKeepScreenOn({
         //     keepScreenOn: true,
         // })
+
+        const isOpen = wx.getStorageSync('openedShelfMin')
+        if (!isOpen) {
+          wx.showTabBarRedDot({
+            index: 2,
+          })
+        }
     }
 
     onHide = () => {

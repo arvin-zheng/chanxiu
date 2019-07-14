@@ -213,6 +213,12 @@
         <view class="arrow">></view>
       </button>
     </view>
+    <view class="wrap" style="height: 80%;font-size: 0.8rem;margin-top: 10px;padding:0;color: #B0976E;">
+      <button class="reset-button m10 pr about-me" style="position: relative;" @tap="openChosen">
+        <view class="ml10p suggest">持壹精选</view>
+        <view class="arrow">></view>
+      </button>
+    </view>
     <!-- 操作 end -->
   </view>
 </template>
@@ -282,6 +288,13 @@
         if (userInfo) {
           that.userInfo = userInfo
           initPage.call(that)
+
+          if (userInfo.nickName) {
+            wx.setStorageSync('openedShelfMin', '1')
+            wx.hideTabBarRedDot({
+              index: 2
+            })
+          }
           that.$apply()
         }
       }, e.detail)
@@ -291,11 +304,28 @@
 
       const userInfo = this.$parent.globalData.userInfo || {}
       this.userInfo = userInfo
+
+      if (userInfo.nickName) {
+        wx.setStorageSync('openedShelfMin', '1')
+        wx.hideTabBarRedDot({
+          index: 2
+        })
+      }
     }
     mixins = [ formIds ]
     methods = {
       onGoAboutMe() {
         this.$navigate('./aboutme', {hour: this.hour, minute: this.minute});
+      },
+      openChosen() {
+        wx.navigateToMiniProgram({
+          appId: 'wx03bd71f622be4ca1',
+          path: 'pages/shelf/shelf',
+          envVersion: 'release',
+          success(res) {
+            // 打开成功
+          }
+        })
       },
       toBriefing() {
         this.$navigate('./ex-briefing');
